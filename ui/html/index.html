@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="https://use.fontawesome.com/fe459689b4.js"></script>
+
+
+  <title>Users</title>
+
+
+</head>
+
+<body>
+  <div class="container" style="padding:0;background-color: white;">
+    <div class="col-sm-3"></div>
+    <div class="col-sm-6">
+      <ul class="list-group">
+        {{range .users}}
+        <li class="list-group-item"> {{.Username}}
+          <form method="POST" class="pull-right" action="/user/delete">
+            <input type="hidden" name="username" value={{.Username}}>
+
+            <input type="submit" value="Delete" class="btn btn-info" style="padding:2px;">
+          </form>
+          <form method="POST" class="pull-right" action="/user/edit">
+            <input type="hidden" name="username" value="User">
+            <input type="submit" value="Edit" class="btn btn-info" style="padding:2px;">
+
+          </form>
+
+        </li>
+{{end}}
+      </ul>
+      <form method="POST" action="/user/create">
+        <input name="username">
+        <input type="submit" value="Add user" class="btn btn-info" style="padding:2px;">
+
+      </form>
+    </div>
+
+
+    <div class="col-sm-3"></div>
+  </div>
+
+</body>
+
+</html>
