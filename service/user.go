@@ -4,51 +4,59 @@ import (
 	"crud/userdb"
 	u "crud/userdb"
 	"fmt"
-	"net/http"
-
-	"github.com/gin-gonic/gin"
+	"strconv"
 )
 
 type UserService interface {
-	CreateUser(c *gin.Context)
-	EditUser(c *gin.Context)
-	DeleteUser(c *gin.Context)
+	CreateUser(string)
+	EditUser(string)
+	DeleteUser(string)
 	GetAllUsers()
 }
 type UserServiceImpl struct {
 	userRepository u.UserDB
 }
 
-func (u UserServiceImpl) CreateUser(c *gin.Context) {
-	username := c.Param("username")
-	err:=u.userRepository.CreateUserinDB(username)
-	if err!=nil{
-		c.String(http.StatusBadRequest,err.Error())
+func NewUsersService(db u.UserDB) *UserServiceImpl {
+	return &UserServiceImpl{
+		userRepository: db,
 	}
-	users:=userdb.User{Username: username}
-	c.JSON(http.StatusOK, users)
-	// username := c.Param("")
-	// u.CreateUserinDB(username)
-}
-func (u UserServiceImpl) EditUser(c *gin.Context) {
-	username := c.Param("username")
-	err:=u.userRepository.EditUserinDB(username)
-	if err!=nil{
-		c.String(http.StatusNotFound,err.Error())
-
-	}
-	users:=userdb.User{Username: username}
-	c.JSON(http.StatusOK, users)
 }
 
-func (u UserServiceImpl) DeleteUser(c *gin.Context) {
-	username := c.Param("username")
-	err:=u.userRepository.DeleteUserinDB(username)
-	if err!=nil{
-		fmt.Println("error in delete user:",err)
+func (u UserServiceImpl) CreateUser(username string) (u.User, error) {
+	user := userdb.User{Username: username}
+	err := u.userRepository.CreateUserinDB(&user)
+
+	return user, err
+}
+func (u UserServiceImpl) EditUser(user u.User) error {
+	// id, err := strconv.Atoi(idstr)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return err
+	// }
+	err := u.userRepository.EditUserinDB(user)
+	if err != nil {
+		fmt.Println(err)
+		return err
+
 	}
-	users:=userdb.User{Username: username}
-	c.JSON(http.StatusOK, users)
+	return nil
+}
+
+func (u UserServiceImpl) DeleteUser(idstr string) error {
+	id, err := strconv.Atoi(idstr)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	err = u.userRepository.DeleteUserinDB(id)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	return nil
 }
 
 func (u UserServiceImpl) GetAllUsers() []u.User {

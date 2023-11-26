@@ -8,8 +8,6 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-  <script src="https://use.fontawesome.com/fe459689b4.js"></script>
-
 
   <title>Users</title>
 
@@ -24,18 +22,19 @@
         {{range .users}}
         <li class="list-group-item"> {{.Username}}
           <form method="POST" class="pull-right" action="/user/delete">
-            <input type="hidden" name="username" value={{.Username}}>
+            <input type="hidden" name="id" value={{.ID}}>
 
             <input type="submit" value="Delete" class="btn btn-info" style="padding:2px;">
           </form>
           <form method="POST" class="pull-right" action="/user/edit">
-            <input type="hidden" name="username" value="User">
+            <input name="username" value={{.Username}}>
+            <input type="hidden" name="id" value={{.ID}}>
             <input type="submit" value="Edit" class="btn btn-info" style="padding:2px;">
 
           </form>
 
         </li>
-{{end}}
+        {{end}}
       </ul>
       <form method="POST" action="/user/create">
         <input name="username">
