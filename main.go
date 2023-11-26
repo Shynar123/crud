@@ -19,8 +19,6 @@ func init() {
 	if err != nil {
 		fmt.Println("db:", err)
 	}
-	u := userdb.User{1, "Shynar"}
-	db.Create(&u)
 }
 func main() {
 
@@ -32,9 +30,9 @@ func main() {
 func setupRouter() *gin.Engine {
 	r := gin.Default()
 	r.LoadHTMLGlob("ui/html/*")
-
+	userService := &service.UserServiceImpl{}
 	r.GET("/", func(c *gin.Context) {
-		users := service.UserService.GetAllUsers()
+		users := userService.GetAllUsers
 		c.HTML(
 			http.StatusOK,
 			"index.html",
@@ -43,7 +41,24 @@ func setupRouter() *gin.Engine {
 				"users": users,
 			},
 		)
+		// c.ShouldBindWith(binding.Binding)
 
+	})
+	r.POST("user/create",func(c *gin.Context){
+		// if err := c.ShouldBindJSON(&userForm); err != nil {
+		// 	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		// 	return
+		// }
+
+		// Call the CreateUser method from your UserService
+		user, err := userService.CreateUser()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+			return
+		}
+
+		// Return the created user as JSON response
+		c.JSON(http.StatusOK, user)
 	})
 	r.POST("/user/edit", service.UserService.CreateUser)
 	r.GET("/users_json", func(c *gin.Context) {
@@ -52,50 +67,6 @@ func setupRouter() *gin.Engine {
 		c.JSON(http.StatusOK, users)
 	})
 	// Get user value
-	r.GET("/users", func(c *gin.Context) {
-		user := c.Params.ByName("name")
-		value, ok := db[user]
-		if ok {
-			c.JSON(http.StatusOK, gin.H{"user": user, "value": value})
-		} else {
-			c.JSON(http.StatusOK, gin.H{"user": user, "status": "no value"})
-		}
-	})
-
-	// Authorized group (uses gin.BasicAuth() middleware)
-	// Same than:
-	// authorized := r.Group("/")
-	// authorized.Use(gin.BasicAuth(gin.Credentials{
-	//	  "foo":  "bar",
-	//	  "manu": "123",
-	//}))
-	authorized := r.Group("/", gin.BasicAuth(gin.Accounts{
-		"foo":  "bar", // user:foo password:bar
-		"manu": "123", // user:manu password:123
-	}))
-
-	/* example curl for /admin with basicauth header
-	   Zm9vOmJhcg== is base64("foo:bar")
-
-		curl -X POST \
-	  	http://localhost:8080/admin \
-	  	-H 'authorization: Basic Zm9vOmJhcg==' \
-	  	-H 'content-type: application/json' \
-	  	-d '{"value":"bar"}'
-	*/
-	authorized.POST("admin", func(c *gin.Context) {
-		user := c.MustGet(gin.AuthUserKey).(string)
-
-		// Parse JSON
-		var json struct {
-			Value string `json:"value" binding:"required"`
-		}
-
-		if c.Bind(&json) == nil {
-			db[user] = json.Value
-			c.JSON(http.StatusOK, gin.H{"status": "ok"})
-		}
-	})
-
+	
 	return r
 }

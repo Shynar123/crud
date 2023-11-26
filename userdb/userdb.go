@@ -16,21 +16,40 @@ type UserDBImpl struct {
 	db *gorm.DB
 }
 
-func (u *UserDBImpl) CreateUserinDB(user *User) {
-	u.db.Save(user)
+func UserRepositoryInit(db *gorm.DB) *UserDBImpl {
+	db.AutoMigrate(&User{})
+	return &UserDBImpl{
+		db: db,
+	}
 }
 
-func (u *UserDBImpl)EditUserinDB() {
-
+func (u *UserDBImpl) CreateUserinDB(user *User) error {
+	err := u.db.Save(user).Error
+	return err
 }
 
-func (u *UserDBImpl)DeleteUserinDB() {
+func (u *UserDBImpl) EditUserinDB(username string) error {
+	user := User{
+		Username: username,
+	}
+	err := u.db.Preload("User").First(&user).Error
+
+	return err
+}
+
+func (u *UserDBImpl) DeleteUserinDB(username string) error {
+	err := u.db.Delete(&User{}, username).Error
+	if err != nil {
+
+		return err
+	}
+	return nil
 
 }
 
 func (u UserDBImpl) GetAllUsersfromDB() ([]User, error) {
 	var users []User
-	var err = u.db.Preload("Role").Find(&users).Error
+	var err = u.db.Preload("User").Find(&users).Error
 	if err != nil {
 		return nil, err
 	}
