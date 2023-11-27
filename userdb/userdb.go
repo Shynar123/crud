@@ -24,17 +24,9 @@ type UserDBImpl struct {
 func UserRepositoryInit() *UserDBImpl {
 	dsn := "admin:admin@tcp(127.0.0.1:3306)/admin"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if dsn == "" {
-		fmt.Println("DB_DSN environment variable is not set.")
-
-	}
-
-	db.AutoMigrate(&User{})
-
 	if err != nil {
 		fmt.Println("db:", err)
 	}
-
 	db.AutoMigrate(&User{})
 	return &UserDBImpl{
 		db: db,

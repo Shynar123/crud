@@ -26,20 +26,12 @@ func NewUsersService(db u.UserDB) *UserServiceImpl {
 func (u UserServiceImpl) CreateUser(username string) (u.User, error) {
 	user := userdb.User{Username: username}
 	err := u.userRepository.CreateUserinDB(&user)
-
 	return user, err
 }
 func (u UserServiceImpl) EditUser(user u.User) error {
-	// id, err := strconv.Atoi(idstr)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return err
-	// }
 	err := u.userRepository.EditUserinDB(user)
 	if err != nil {
-		fmt.Println(err)
 		return err
-
 	}
 	return nil
 }
@@ -47,15 +39,13 @@ func (u UserServiceImpl) EditUser(user u.User) error {
 func (u UserServiceImpl) DeleteUser(idstr string) error {
 	id, err := strconv.Atoi(idstr)
 	if err != nil {
-		fmt.Println(err)
+		
 		return err
 	}
 	err = u.userRepository.DeleteUserinDB(id)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
-
 	return nil
 }
 
@@ -64,7 +54,5 @@ func (u UserServiceImpl) GetAllUsers() []u.User {
 	if err != nil {
 		fmt.Println("Get users error:", err)
 	}
-	// c.JSON(http.StatusOK, users)
-	//users?
 	return users
 }
